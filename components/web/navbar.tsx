@@ -1,5 +1,6 @@
-import { Button, buttonVariants } from 
-import Link from "next/link""@/components/ui/button"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { ThemeToggle } from "./theme-toggle"
 
 export function Navbar() {
   return (
@@ -30,6 +31,7 @@ export function Navbar() {
                     <Button variant="outline" asChild>
                     <Link href="/auth/Login">Login</Link>
                     </Button>
+                    <ThemeToggle />
                 </div>
     </nav>
   )}           
