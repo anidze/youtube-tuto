@@ -16,6 +16,9 @@ export default function SignUpPage () {
             password: "",
         }
     });
+    function onSubmit(){
+        console.log("hello")
+    }
     return (
         <Card>
             <CardHeader>
@@ -23,13 +26,13 @@ export default function SignUpPage () {
                 <CardDescription>Create an Account to get started</CardDescription>
             </CardHeader>
             <CardContent>
-                <form>
-                <FieldGroup>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
+                <FieldGroup className="gap-y-2">
                     <Controller name="name" control={form.control} render={({field,fieldState})=>(
                         <Field>
                             <FieldLabel>Name</FieldLabel>
                             
-                                <Input placeholder="John Doe" {...field} /> 
+                                <Input aria-invalid={fieldState.invalid} placeholder="John Doe" {...field} /> 
                                 {fieldState.error && <p className="text-red-500 text-sm mt-1">{fieldState.error.message}</p>}
                            
                         </Field>
@@ -38,7 +41,7 @@ export default function SignUpPage () {
                         <Field>
                             <FieldLabel>Email</FieldLabel>
                             
-                                <Input placeholder="john.doe@example.com" {...field} /> 
+                                <Input aria-invalid={fieldState.invalid} placeholder="john.doe@example.com" {...field} /> 
                                 {fieldState.error && <p className="text-red-500 text-sm mt-1">{fieldState.error.message}</p>}
                            
                         </Field>
@@ -47,7 +50,7 @@ export default function SignUpPage () {
                         <Field>
                             <FieldLabel>Password</FieldLabel>
                             
-                                <Input placeholder="********" type="password" {...field} /> 
+                                <Input aria-invalid={fieldState.invalid} placeholder="********" type="password" {...field} /> 
                                 {fieldState.error && <p className="text-red-500 text-sm mt-1">{fieldState.error.message}</p>}
                            
                         </Field>
