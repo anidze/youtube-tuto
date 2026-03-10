@@ -6,6 +6,8 @@ import { signUpSchema } from "@/app/schemas/auth";
 import { Input } from "@/components/ui/input";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth-client";
+import z from "zod";
 
 export default function SignUpPage () {
     const form= useForm({
@@ -16,8 +18,12 @@ export default function SignUpPage () {
             password: "",
         }
     });
-    function onSubmit(){
-        console.log("hello")
+   async function onSubmit(data: z.infer<typeof signUpSchema>) {
+  await authClient.signUp.email({
+    email: form.getValues("email"),
+    name: form.getValues("name"),
+    password: form.getValues("password"),
+  });
     }
     return (
         <Card>
