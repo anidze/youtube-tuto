@@ -8,8 +8,11 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 import z from "zod";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function SignUpPage () {
+    const router = useRouter();
     const form= useForm({
         resolver: zodResolver(signUpSchema),
         defaultValues: {
@@ -20,9 +23,17 @@ export default function SignUpPage () {
     });
    async function onSubmit(data: z.infer<typeof signUpSchema>) {
   await authClient.signUp.email({
-    email: form.getValues("email"),
-    name: form.getValues("name"),
-    password: form.getValues("password"),
+    email: data.email,
+    name: data.name,
+    password: data.password,
+          fetchOptions: { onSuccess:()=>{
+                toast.success("Signd up successfully");   
+                router.push("/");
+              },
+              onError:(err)=>{
+                toast.error(err?.error?.message || "Failed to Signd up");
+              },
+    },
   });
     }
     return (

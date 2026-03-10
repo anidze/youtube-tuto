@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ConvexClientProvider } from "@/app/components/web/ConvexClientProvider";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { Toaster } from "sonner"
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -27,18 +29,19 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
         >
-             <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >{""}  
+          {""}
           <main className="max-w-7xl mx-auto w-full px-4 md:px-6 lg:px-8">
-      
-        <ConvexClientProvider>{children}</ConvexClientProvider>
-        </main>
-          </ThemeProvider>
+            <ConvexClientProvider>{children}</ConvexClientProvider>
+          </main>
+          <Toaster  closeButton/>
+        </ThemeProvider>
       </body>
     </html>
   );
