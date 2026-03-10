@@ -1,5 +1,13 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## About This Project
+
+This project is developed by following a tutorial and uses only learning material. It's based on the following YouTube video:
+
+📺 **Tutorial Source:** [YouTube Video](https://www.youtube.com/watch?v=MZbwu3-uz3Y)
+
+This is an educational project created for learning purposes.
+
 ## Getting Started
 
 First, run the development server:
