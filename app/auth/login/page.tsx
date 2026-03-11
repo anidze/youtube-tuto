@@ -1,5 +1,11 @@
 "use client";
-import { Card, CardTitle, CardHeader, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardTitle,
+  CardHeader,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/app/schemas/auth";
@@ -10,9 +16,12 @@ import { authClient } from "@/lib/auth-client";
 import z from "zod";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useTransition } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function LoginPage() {
-    const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
   const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -21,27 +30,29 @@ export default function LoginPage() {
     },
   });
 
-  async function onSubmit(data: z.infer<typeof loginSchema>) {
-    await authClient.signIn.email({
-      email: data.email,
-      password: data.password,
-         fetchOptions: { onSuccess:()=>{
-                toast.success("Logged in successfully");   
-                router.push("/");
-              },
-              onError:(err)=>{
-                toast.error(err?.error?.message || "Failed to log in");
-              },
-    },
-  })
-
+  function onSubmit(data: z.infer<typeof loginSchema>) {
+    startTransition(async () => {
+      await authClient.signIn.email({
+        email: data.email,
+        password: data.password,
+        fetchOptions: {
+          onSuccess: () => {
+            toast.success("Logged in successfully");
+            router.push("/");
+          },
+          onError: (err) => {
+            toast.error(err?.error?.message || "Failed to log in");
+          },
+        },
+      });
+    });
   }
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Login</CardTitle>
-        <CardDescription>Sign in to your account</CardDescription>
+        <CardDescription>Login in to your account</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -85,11 +96,13 @@ export default function LoginPage() {
                 </Field>
               )}
             />
-            <Button type="submit">Login in </Button>
+            <Button disabled={isPending} type="submit">{isPending ? <>
+            <Loader2 className="animate-spin mr-2" />
+            Logging in...
+            </> : "Login"}</Button>
           </FieldGroup>
         </form>
       </CardContent>
     </Card>
   );
 }
-
