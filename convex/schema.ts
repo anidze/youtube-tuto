@@ -1,10 +1,9 @@
-import { defineSchema, defineTable } from "convex/server";
+import { defineSchema, defineTable} from "convex/server";
 import { v } from "convex/values";
-
-const schema = defineSchema({
-  tasks: defineTable({
-    text: v.string(),
-    isCompleted: v.boolean(),
-  }),
+export default defineSchema({
+  post: defineTable({
+    title: v.string(),
+    body: v.string(),
+    authorId: v.string(),
+  }) 
 });
-export default schema;
