@@ -1,5 +1,6 @@
 'use client';
 
+import { createBlogAction } from "@/app/actions";
 import { postSchema } from "@/app/schemas/blog";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,10 +16,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/convex/_generated/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/dist/client/components/navigation";
+import { useEffect, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import z from "zod";
+import { authClient } from "@/lib/auth-client";
+
+
 
 export default function CreateRoute() {
+    const { data: session, isPending: isSessionPending } = authClient.useSession();
+    const [isTransitioning, startTransition] = useTransition();
+    const router = useRouter();
     const mutation=useMutation(api.posts.createPost);
         const form= useForm({
             resolver: zodResolver(postSchema),
@@ -27,11 +38,26 @@ export default function CreateRoute() {
                 content:"",
             }
         });
+
+        // Redirect to login if not authenticated
+        useEffect(() => {
+            if (!isSessionPending && !session) {
+                router.push("/auth/login");
+            }
+        }, [session, isSessionPending, router]);
         function onSubmit(data: z.infer<typeof postSchema>) {
-            mutation({
-                title: data.title,
-                body: data.content,
-            })
+            startTransition(async()=>{
+            //     mutation({
+            //     title: data.title,
+            //     body: data.content,
+            // });
+
+            console.log("this runs n clints side")
+            await createBlogAction();
+       
+            toast.success("Entry created successfully");
+            router.push("/");
+            });
 
         }
   return (
@@ -72,7 +98,10 @@ export default function CreateRoute() {
                    
                 </Field>
             )}/>
-            <Button type="submit" className="mt-4">Create Post</Button>
+             <Button disabled={isTransitioning} type="submit">{isTransitioning ? <>
+            <Loader2 className="animate-spin mr-2" />
+            Create Post
+            </> : "Create Post"}</Button>
         </FieldGroup>
     </form>
 </CardContent>
