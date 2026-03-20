@@ -4,7 +4,7 @@ import { authComponent } from "./auth";
 
 // Create a new task with the given text
 export const createPost = mutation({
-  args: { title: v.string(), body: v.string() },
+  args: { title: v.string(), body: v.string(), storageId: v.optional(v.id("_storage")) },
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) {
@@ -14,6 +14,7 @@ export const createPost = mutation({
       title: args.title,
       body: args.body,
       authorId: user._id as string,
+      imageStorageId: args.storageId,
     });
     return blogArticle;
   },
@@ -22,10 +23,41 @@ export const getPosts = query({
   args: {},
   handler: async (ctx) => {
     const posts = await ctx.db.query("post").order("desc").collect();
-    return posts;
+    return Promise.all(
+      posts.map(async (post) => ({
+        ...post,
+        imageUrl: post.imageStorageId
+          ? await ctx.storage.getUrl(post.imageStorageId)
+          : null,
+      }))
+    );
   },
 });
 
+export const getPost = query({
+  args: { postId: v.id("post") },
+  handler: async (ctx, args) => {
+    const post = await ctx.db.get(args.postId);
+    if (!post) {
+      throw new ConvexError("Post not found");
+    }
+    const imageUrl = post.imageStorageId
+      ? await ctx.storage.getUrl(post.imageStorageId)
+      : null;
+    return { ...post, imageUrl };
+  },
+});
+export const generateImageUploadURL = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if(!user){
+      throw new ConvexError("Not Authenticated");
+    }
+    // Generate and return the image upload URL here
+    return await ctx.storage.generateUploadUrl();
+  },
+});
 export const deletePost = mutation({
   args: { postId: v.id("post") },
   handler: async (ctx, args) => {
@@ -47,3 +79,4 @@ export const deletePost = mutation({
     return { success: true };
   },
 });
+

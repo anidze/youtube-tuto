@@ -32,6 +32,7 @@ export default function CreateRoute() {
     defaultValues: {
       title: "",
       content: "",
+      image: undefined,
     },
   });
 
@@ -87,6 +88,7 @@ export default function CreateRoute() {
               />
             </FieldGroup>
             <FieldGroup className="mt-2">
+           
               <Controller
                 name="content"
                 control={form.control}
@@ -98,6 +100,31 @@ export default function CreateRoute() {
                       aria-invalid={fieldState.invalid}
                       placeholder="Enter content"
                       {...field}
+                    />
+                    {fieldState.error && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {fieldState.error.message}
+                      </p>
+                    )}
+                  </Field>
+                )}
+              />
+                 <Controller
+                name="image"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel>Image</FieldLabel>
+
+                    <Input
+                      type="file"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Enter Img"
+                     accept="image/*"
+                     onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      field.onChange(file);
+                     }}
                     />
                     {fieldState.error && (
                       <p className="text-red-500 text-sm mt-1">

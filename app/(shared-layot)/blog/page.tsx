@@ -41,14 +41,18 @@ function BlogGrid() {
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {data?.map((post) => (
+      {data?.map((post) => {
+        const imageUrl = post.imageUrl
+          || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNu9uulWIgqP6ax8ikiM4eQUf2cNqGtOMkaQ&s";
+        
+        return (
         <Card key={post._id} className="pt-0 flex flex-col">
           <div className="relative h-48 w-full overflow-hidden">
             <Image
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNu9uulWIgqP6ax8ikiM4eQUf2cNqGtOMkaQ&s"
+              src={imageUrl}
               alt="Blog Post Image"
               fill
-              className="rounded-t-lg"
+              className="rounded-t-lg object-cover"
             />
           </div>
           <CardContent className="px-6 flex-1">
@@ -99,7 +103,8 @@ function BlogGrid() {
             )}
           </CardFooter>
         </Card>
-      ))}
+        );
+      })}
     </div>
   );
 }
