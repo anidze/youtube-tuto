@@ -4,7 +4,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Pencil } from "lucide-react";
 import Image from "next/image";
 import Link from "next/dist/client/link";
 import { useParams } from "next/navigation";
@@ -20,7 +20,7 @@ export default function BlogPostPage() {
     return (
       <div className="py-12 max-w-3xl mx-auto">
         <Skeleton className="h-8 w-24 mb-8" />
-        <Skeleton className="h-[400px] w-full rounded-lg mb-8" />
+        <Skeleton className="h-full w-full rounded-lg mb-8" />
         <Skeleton className="h-10 w-3/4 mb-4" />
         <Skeleton className="h-4 w-full mb-2" />
         <Skeleton className="h-4 w-full mb-2" />
@@ -31,22 +31,35 @@ export default function BlogPostPage() {
 
   return (
     <div className="py-12 max-w-3xl mx-auto">
-      <Link
-        href="/blog"
-        className={buttonVariants({ variant: "ghost", className: "mb-8" })}
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Blog
-      </Link>
+      <div className="flex items-center justify-between mb-8">
+        <Link
+          href="/blog"
+          className={buttonVariants({ variant: "ghost" })}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Blog
+        </Link>
 
-      <div className="relative h-[400px] w-full overflow-hidden rounded-lg mb-8">
+        {post.isAuthor && (
+          <Link
+            href={`/blog/${id}/edit`}
+            className={buttonVariants({ variant: "outline" })}
+          >
+            <Pencil className="mr-2 h-4 w-4" />
+            Edit Post
+          </Link>
+        )}
+      </div>
+
+      <div className="relative w-full overflow-hidden rounded-lg mb-8">
         <Image
           src={post.imageUrl
             || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNu9uulWIgqP6ax8ikiM4eQUf2cNqGtOMkaQ&s"
           }
           alt={post.title}
-          fill
-          className="object-cover rounded-lg"
+          width={800}
+          height={800}
+          className=" h-full rounded-lg"
         />
       </div>
 

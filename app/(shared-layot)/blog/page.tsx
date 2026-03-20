@@ -47,12 +47,12 @@ function BlogGrid() {
         
         return (
         <Card key={post._id} className="pt-0 flex flex-col">
-          <div className="relative h-48 w-full overflow-hidden">
+          <div className="relative aspect-video w-full overflow-hidden">
             <Image
               src={imageUrl}
               alt="Blog Post Image"
               fill
-              className="rounded-t-lg object-cover"
+              className="rounded-t-lg w-full h-full object-cover"
             />
           </div>
           <CardContent className="px-6 flex-1">
@@ -72,7 +72,7 @@ function BlogGrid() {
             >
               Read More
             </Link>
-            {session && (
+            {session && post.isAuthor && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" size="icon">
