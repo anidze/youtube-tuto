@@ -121,3 +121,124 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Wikipedia article content styles */
+.wikipedia-content {
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.wikipedia-content a {
+  color: inherit;
+  text-decoration: none;
+  pointer-events: none;
+}
+
+.wikipedia-content h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.wikipedia-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.wikipedia-content h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.wikipedia-content p {
+  margin-bottom: 1rem;
+}
+
+.wikipedia-content ul,
+.wikipedia-content ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.wikipedia-content li {
+  margin-bottom: 0.25rem;
+}
+
+.wikipedia-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  overflow-x: auto;
+  display: block;
+}
+
+.wikipedia-content table th,
+.wikipedia-content table td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.wikipedia-content table th {
+  background-color: var(--muted);
+  font-weight: 600;
+}
+
+.wikipedia-content .infobox,
+.wikipedia-content .wikitable {
+  display: none;
+}
+
+.wikipedia-content .thumb,
+.wikipedia-content .tmulti,
+.wikipedia-content figure,
+.wikipedia-content .image,
+.wikipedia-content a.image {
+  display: none;
+}
+
+.wikipedia-content .thumbcaption,
+.wikipedia-content .magnify {
+  display: none;
+}
+
+.wikipedia-content img {
+  display: none;
+}
+
+.wikipedia-content .mw-empty-elt,
+.wikipedia-content .mw-editsection,
+.wikipedia-content .noprint,
+.wikipedia-content .sistersitebox,
+.wikipedia-content .navbox,
+.wikipedia-content .metadata,
+.wikipedia-content .ambox,
+.wikipedia-content .portal,
+.wikipedia-content .authority-control {
+  display: none;
+}
+
+.wikipedia-content .reflist,
+.wikipedia-content .references,
+.wikipedia-content sup.reference {
+  display: none;
+}
+
+.wikipedia-content blockquote {
+  border-left: 3px solid var(--primary);
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+@media (max-width: 640px) {
+}

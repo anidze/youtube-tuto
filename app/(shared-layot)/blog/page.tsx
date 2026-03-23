@@ -25,7 +25,7 @@ import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 function BlogGrid() {
-  const data = useQuery(api.posts.getPosts);
+  const data = useQuery(api.posts.getMyPosts);
   const deletePost = useMutation(api.posts.deletePost);
   const { data: session } = authClient.useSession();
 
@@ -52,7 +52,7 @@ function BlogGrid() {
               src={imageUrl}
               alt="Blog Post Image"
               fill
-              className="rounded-t-lg w-full h-full object-cover"
+              className="rounded-t-lg  object-cover"
             />
           </div>
           <CardContent className="px-6 flex-1">
@@ -134,10 +134,10 @@ export default function BlogPage() {
     <div className="py-12">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
-          Our Blog
+          My Articles
         </h1>
         <p className="pt-4 max-w-2xl mx-auto text-xl text-muted-foreground">
-          Insight, thought, and trend from our team.
+          Your created articles.
         </p>
       </div>
       <Suspense fallback={<BlogGridSkeleton />}>

@@ -44,7 +44,7 @@ export async function createBlogAction(data: z.infer<typeof postSchema>) {
     title: parsed.data.title,
     storageId: storageId,
   });
-  redirect("/");
+  redirect("/blog");
 }
 
 export async function updateBlogAction(

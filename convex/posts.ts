@@ -1,6 +1,16 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query, QueryCtx } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
 import { authComponent } from "./auth";
+
+async function resolveAuthorName(ctx: QueryCtx, authorId: string, storedName?: string): Promise<string> {
+  if (storedName) return storedName;
+  try {
+    const user = await authComponent.getAnyUserById(ctx, authorId);
+    return (user as unknown as { name?: string })?.name || "Unknown";
+  } catch {
+    return "Unknown";
+  }
+}
 
 // Create a new task with the given text
 export const createPost = mutation({
@@ -14,6 +24,7 @@ export const createPost = mutation({
       title: args.title,
       body: args.body,
       authorId: user._id as string,
+      authorName: (user as unknown as { name: string }).name || "Unknown",
       imageStorageId: args.storageId,
     });
     return blogArticle;
@@ -27,10 +38,33 @@ export const getPosts = query({
     return Promise.all(
       posts.map(async (post) => ({
         ...post,
+        authorName: await resolveAuthorName(ctx, post.authorId, post.authorName ?? undefined),
         imageUrl: post.imageStorageId
           ? await ctx.storage.getUrl(post.imageStorageId)
           : null,
         isAuthor: user ? post.authorId === (user._id as string) : false,
+      }))
+    );
+  },
+});
+
+export const getMyPosts = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+    if (!user) {
+      return [];
+    }
+    const posts = await ctx.db.query("post").order("desc").collect();
+    const myPosts = posts.filter((post) => post.authorId === (user._id as string));
+    return Promise.all(
+      myPosts.map(async (post) => ({
+        ...post,
+        authorName: await resolveAuthorName(ctx, post.authorId, post.authorName ?? undefined),
+        imageUrl: post.imageStorageId
+          ? await ctx.storage.getUrl(post.imageStorageId)
+          : null,
+        isAuthor: true,
       }))
     );
   },
@@ -49,6 +83,7 @@ export const getPost = query({
       : null;
     return {
       ...post,
+      authorName: await resolveAuthorName(ctx, post.authorId, post.authorName ?? undefined),
       imageUrl,
       isAuthor: user ? post.authorId === (user._id as string) : false,
     };
@@ -78,7 +113,7 @@ export const deletePost = mutation({
       throw new ConvexError("Post not found");
     }
 
-    if (post.authorId !== user._id) {
+    if (post.authorId !== (user._id as string)) {
       throw new ConvexError("Unauthorized: You can only delete your own posts");
     }
 
@@ -105,7 +140,7 @@ export const updatePost = mutation({
       throw new ConvexError("Post not found");
     }
 
-    if (post.authorId !== user._id) {
+    if (post.authorId !== (user._id as string)) {
       throw new ConvexError("Unauthorized: You can only edit your own posts");
     }
 

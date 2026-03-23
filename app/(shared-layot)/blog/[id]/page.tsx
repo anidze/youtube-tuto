@@ -9,6 +9,7 @@ import Image from "next/image";
 import Link from "next/dist/client/link";
 import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import WikipediaArticle from "@/app/components/web/wikipedia-article";
 
 export default function BlogPostPage() {
   const { id } = useParams<{ id: string }>();
@@ -51,15 +52,15 @@ export default function BlogPostPage() {
         )}
       </div>
 
-      <div className="relative w-full overflow-hidden rounded-lg mb-8">
+      <div className="relative w-fit overflow-hidden rounded-lg mb-8">
         <Image
           src={post.imageUrl
             || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNu9uulWIgqP6ax8ikiM4eQUf2cNqGtOMkaQ&s"
           }
           alt={post.title}
-          width={800}
-          height={800}
-          className=" h-full rounded-lg"
+          width={400}
+          height={400}
+          className="rounded-lg"
         />
       </div>
 
@@ -67,9 +68,7 @@ export default function BlogPostPage() {
         {post.title}
       </h1>
 
-      <p className="text-lg text-muted-foreground leading-relaxed whitespace-pre-wrap">
-        {post.body}
-      </p>
+      <WikipediaArticle title={post.title} />
     </div>
   );
 }
