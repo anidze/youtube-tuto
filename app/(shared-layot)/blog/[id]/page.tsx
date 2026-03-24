@@ -10,6 +10,7 @@ import Link from "next/dist/client/link";
 import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import WikipediaArticle from "@/app/components/web/wikipedia-article";
+import Comments from "@/app/components/web/comments";
 
 export default function BlogPostPage() {
   const { id } = useParams<{ id: string }>();
@@ -69,6 +70,8 @@ export default function BlogPostPage() {
       </h1>
 
       <WikipediaArticle title={post.title} />
+
+      <Comments postId={id as Id<"post">} />
     </div>
   );
 }

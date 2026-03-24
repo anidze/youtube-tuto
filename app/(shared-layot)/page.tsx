@@ -2,14 +2,69 @@
 "use client";
 
 import { buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/convex/_generated/api";
-import { useQuery } from "convex/react";
+import { Id } from "@/convex/_generated/dataModel";
+import { useQuery, useMutation } from "convex/react";
 import Link from "next/dist/client/link";
 import Image from "next/image";
-import { Suspense } from "react";
-import { User } from "lucide-react";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { User, Heart } from "lucide-react";
+
+function getStoredLikes(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = localStorage.getItem("likedPosts");
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+
+function setStoredLikes(liked: Set<string>) {
+  localStorage.setItem("likedPosts", JSON.stringify([...liked]));
+}
+
+function LikeButton({ postId, likes }: { postId: Id<"post">; likes: number }) {
+  const likePost = useMutation(api.posts.likePost);
+  const [isLiked, setIsLiked] = useState(false);
+
+  useEffect(() => {
+    setIsLiked(getStoredLikes().has(postId));
+  }, [postId]);
+
+  const handleToggle = useCallback(async () => {
+    const liked = getStoredLikes();
+    const willUnlike = liked.has(postId);
+
+    // Optimistic UI
+    setIsLiked(!willUnlike);
+    if (willUnlike) {
+      liked.delete(postId);
+    } else {
+      liked.add(postId);
+    }
+    setStoredLikes(liked);
+
+    await likePost({ postId, unlike: willUnlike });
+  }, [postId, likePost]);
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={handleToggle}
+      className="gap-1.5"
+    >
+      <Heart
+        className={`h-4 w-4 ${isLiked ? "fill-red-500 text-red-500" : ""}`}
+      />
+      <span>{likes}</span>
+    </Button>
+  );
+}
 
 function AllPostsGrid() {
   const data = useQuery(api.posts.getPosts);
@@ -51,6 +106,7 @@ function AllPostsGrid() {
               </div>
             </CardContent>
             <CardFooter className="flex gap-2 px-6 mt-auto">
+              <LikeButton postId={post._id} likes={post.likes ?? 0} />
               <Link
                 className={buttonVariants({ className: "flex-1" })}
                 href={`/blog/${post._id}`}

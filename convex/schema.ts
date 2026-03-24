@@ -7,5 +7,11 @@ export default defineSchema({
     authorId: v.string(),
     authorName: v.optional(v.string()),
     imageStorageId: v.optional(v.id("_storage")),
-  }) 
+    likes: v.optional(v.number()),
+  }),
+  comment: defineTable({
+    postId: v.id("post"),
+    author: v.string(),
+    body: v.string(),
+  }),
 });

@@ -2,6 +2,16 @@ import { mutation, query, QueryCtx } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
 import { authComponent } from "./auth";
 
+interface AuthUser {
+  _id: string;
+  name: string;
+  email: string;
+}
+
+function getUser(user: unknown): AuthUser {
+  return user as AuthUser;
+}
+
 async function resolveAuthorName(ctx: QueryCtx, authorId: string, storedName?: string): Promise<string> {
   if (storedName) return storedName;
   try {
@@ -23,8 +33,8 @@ export const createPost = mutation({
     const blogArticle = await ctx.db.insert("post", {
       title: args.title,
       body: args.body,
-      authorId: user._id as string,
-      authorName: (user as unknown as { name: string }).name || "Unknown",
+      authorId: getUser(user)._id,
+      authorName: getUser(user).name || "Unknown",
       imageStorageId: args.storageId,
     });
     return blogArticle;
@@ -42,7 +52,7 @@ export const getPosts = query({
         imageUrl: post.imageStorageId
           ? await ctx.storage.getUrl(post.imageStorageId)
           : null,
-        isAuthor: user ? post.authorId === (user._id as string) : false,
+        isAuthor: user ? post.authorId === getUser(user)._id : false,
       }))
     );
   },
@@ -56,7 +66,7 @@ export const getMyPosts = query({
       return [];
     }
     const posts = await ctx.db.query("post").order("desc").collect();
-    const myPosts = posts.filter((post) => post.authorId === (user._id as string));
+    const myPosts = posts.filter((post) => post.authorId === getUser(user)._id);
     return Promise.all(
       myPosts.map(async (post) => ({
         ...post,
@@ -85,7 +95,7 @@ export const getPost = query({
       ...post,
       authorName: await resolveAuthorName(ctx, post.authorId, post.authorName ?? undefined),
       imageUrl,
-      isAuthor: user ? post.authorId === (user._id as string) : false,
+      isAuthor: user ? post.authorId === getUser(user)._id : false,
     };
   },
 });
@@ -113,7 +123,7 @@ export const deletePost = mutation({
       throw new ConvexError("Post not found");
     }
 
-    if (post.authorId !== (user._id as string)) {
+    if (post.authorId !== getUser(user)._id) {
       throw new ConvexError("Unauthorized: You can only delete your own posts");
     }
 
@@ -140,7 +150,7 @@ export const updatePost = mutation({
       throw new ConvexError("Post not found");
     }
 
-    if (post.authorId !== (user._id as string)) {
+    if (post.authorId !== getUser(user)._id) {
       throw new ConvexError("Unauthorized: You can only edit your own posts");
     }
 
@@ -151,6 +161,48 @@ export const updatePost = mutation({
     });
 
     return { success: true };
+  },
+});
+
+export const likePost = mutation({
+  args: { postId: v.id("post"), unlike: v.boolean() },
+  handler: async (ctx, args) => {
+    const post = await ctx.db.get(args.postId);
+    if (!post) {
+      throw new ConvexError("Post not found");
+    }
+    const currentLikes = post.likes ?? 0;
+    const newLikes = args.unlike
+      ? Math.max(0, currentLikes - 1)
+      : currentLikes + 1;
+    await ctx.db.patch(args.postId, { likes: newLikes });
+    return { likes: newLikes };
+  },
+});
+
+export const getComments = query({
+  args: { postId: v.id("post") },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("comment")
+      .filter((q) => q.eq(q.field("postId"), args.postId))
+      .order("desc")
+      .collect();
+  },
+});
+
+export const addComment = mutation({
+  args: { postId: v.id("post"), author: v.string(), body: v.string() },
+  handler: async (ctx, args) => {
+    const post = await ctx.db.get(args.postId);
+    if (!post) {
+      throw new ConvexError("Post not found");
+    }
+    return await ctx.db.insert("comment", {
+      postId: args.postId,
+      author: args.author.trim() || "Anonymous",
+      body: args.body.trim(),
+    });
   },
 });
 
